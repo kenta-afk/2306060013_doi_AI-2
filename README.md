@@ -50,28 +50,32 @@
 
 ```
 assignment/
-├── app.py                 # メインアプリケーション
+├── app.py                 # メインStreamlitアプリケーション
 │   ├── main()            # メイン関数
 │   ├── UI構築            # Streamlitコンポーネント
 │   └── イベントハンドリング# ボタンクリック等の処理
 │
-├── weather_logic.py       # ビジネスロジック
-│   ├── WeatherService    # 天気情報取得クラス
-│   │   ├── get_coordinates()    # 都市→座標変換
-│   │   ├── get_weather_data()   # 座標→天気データ
-│   │   └── get_weather()        # メイン処理
+├── src/                   # ビジネスロジック層
+│   ├── weather_logic.py   # 天気情報取得・DB操作
+│   │   ├── WeatherService    # 天気情報取得クラス
+│   │   │   ├── get_coordinates()    # 都市→座標変換
+│   │   │   ├── get_weather_data()   # 座標→天気データ
+│   │   │   └── get_weather()        # メイン処理
+│   │   │
+│   │   ├── DatabaseService   # データベース操作クラス
+│   │   │   ├── save_search_history()  # 履歴保存
+│   │   │   ├── get_search_history()   # 履歴取得
+│   │   │   └── get_city_statistics()  # 統計データ
+│   │   │
+│   │   └── weather_code_to_description() # ユーティリティ関数
 │   │
-│   ├── DatabaseService   # データベース操作クラス
-│   │   ├── save_search_history()  # 履歴保存
-│   │   ├── get_search_history()   # 履歴取得
-│   │   └── get_city_statistics()  # 統計データ
-│   │
-│   └── weather_code_to_description() # ユーティリティ関数
+│   └── data/              # データ保存ディレクトリ
+│       └── search_history.csv # 検索履歴データベース
 │
-├── data/                  # データ保存ディレクトリ
-│   └── search_history.csv # 検索履歴データベース
-│
-└── requirements.txt       # 依存関係定義
+├── pyproject.toml         # 依存関係定義（uv対応）
+├── README.md              # このファイル
+└── .streamlit/            # Streamlit設定
+    └── config.toml        # アプリケーション設定
 ```
 
 ## 📊 データベース設計
@@ -98,12 +102,23 @@ assignment/
 
 ### 1. 環境セットアップ
 ```bash
-# 仮想環境の作成・有効化（自動設定済み）
-# 依存関係のインストール（自動実行済み）
+# uvがインストールされていない場合
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# プロジェクトクローン
+git clone https://github.com/kenta-afk/2306060013_doi_AI-2.git
+cd 2306060013_doi_AI-2
+
+# 依存関係のインストール（pyproject.tomlから自動）
+uv sync
 ```
 
 ### 2. アプリケーションの起動
 ```bash
+# uvで実行
+uv run streamlit run app.py
+
+# または通常のPython環境で
 streamlit run app.py
 ```
 
@@ -118,19 +133,29 @@ streamlit run app.py
 ```
 /Users/doikentarou/assignment/
 ├── app.py              # Streamlitアプリケーション本体
-├── weather_logic.py    # ビジネスロジック（天気情報取得・DB操作）
-├── requirements.txt    # Python依存関係
-├── data/              # データベースディレクトリ
-│   └── search_history.csv  # 検索履歴（自動生成）
+├── src/               # ビジネスロジック層
+│   ├── weather_logic.py    # 天気情報取得・DB操作
+│   └── data/              # データベースディレクトリ
+│       └── search_history.csv  # 検索履歴（自動生成）
+├── pyproject.toml     # Python依存関係（uv対応）
+├── .streamlit/        # Streamlit設定
+│   └── config.toml    # アプリケーション設定
+├── .gitignore         # Git除外設定
 └── README.md          # このファイル
 ```
 
 ## 🎯 技術的特徴
 
 ### アーキテクチャ
-- **分離されたコンポーネント**: UI層（app.py）とロジック層（weather_logic.py）を分離
+- **分離されたコンポーネント**: UI層（app.py）とロジック層（src/weather_logic.py）を分離
 - **クラスベース設計**: WeatherServiceとDatabaseServiceで責任を分離
 - **エラーハンドリング**: 各API呼び出しで適切な例外処理を実装
+- **モジュール構造**: src/ディレクトリでロジック部分を整理
+
+### パッケージ管理
+- **uv対応**: 高速なPythonパッケージマネージャー
+- **pyproject.toml**: 現代的な依存関係管理
+- **PEP 621準拠**: 標準的なプロジェクト設定形式
 
 ### データベース機能（+3点対象）
 - CSV形式での永続化
@@ -143,6 +168,11 @@ streamlit run app.py
 - リアルタイムでの結果表示
 - 詳細情報の展開表示
 - 検索履歴の可視化
+
+### デプロイメント
+- **Streamlit Cloud対応**: メインファイルがルートに配置
+- **Git連携**: 自動デプロイ設定済み
+- **依存関係自動解決**: pyproject.tomlでの管理
 
 ## 📈 今後の拡張可能性
 
