@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import os
-from weather_logic import WeatherService, DatabaseService
+from src.weather_logic import WeatherService, DatabaseService
 
 # ページ設定
 st.set_page_config(
